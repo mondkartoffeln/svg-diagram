@@ -1,6 +1,7 @@
 ---
 name: svg-diagram
 description: SVG diagramming conventions blending a technical look with CJK-friendly typography. Use when creating flowcharts, architecture diagrams, and similar SVG figures. For one-shot generation, prefer invoking it from a subagent so the main context does not have to carry this skill plus the SVG XML; for multi-round tweaking, use it directly in the main context.
+whenToUse: The user asks for an architecture diagram, flowchart, sequence/lifecycle/data-flow figure, or any SVG illustration for a document or README; a document needs its figure created, restyled, or updated to match changed prose; or an existing hand-written SVG looks off (boxes misaligned, connectors crossing boxes, text spilling out) and needs to be checked or repaired. Ships a runnable linter at tools/svg-lint/ — run it instead of eyeballing the checklist.
 ---
 
 # SVG Diagramming Conventions
@@ -528,6 +529,35 @@ svg += f'<text>{svg_escape(team_name)}</text>'
 | Too much blank space overall | Check whether box spacing >30px or viewBox margin >25px |
 
 ## Verification checklist
+
+> ### Run the linter first — do not eyeball this list
+>
+> Most items below are already implemented as automated checks in the checker bundled with this
+> skill. Run it **before** walking the list by hand:
+>
+> ```bash
+> node tools/svg-lint/bin/svg-lint.mjs path/to/diagram.svg
+> ```
+>
+> (relative to this skill's directory; use `--json` for machine-readable output, `--quiet` for
+> errors only). Every finding carries a `repair:` line telling you exactly what to change —
+> e.g. `viewBox: left inset -24 → 20–25`.
+>
+> ★ **Exit code 0 is NOT enough.** The CLI exits 0 when there are no *errors*, but the house style
+> asks for **0 errors AND 0 warnings**. When warnings remain the text report ends with:
+>
+> ```
+> !! WARNINGS PRESENT — house style requires 0 errors AND 0 warnings
+> ```
+>
+> So the pass condition is **exit 0 *and* no `WARNINGS PRESENT` line**. Fix everything the linter
+> reports and re-run until both hold — then use the manual list below. The manual list still
+> matters for the few things the checker cannot judge: above all whether a connector's *meaning*
+> is inferable, and whether dashed grouping boxes are styled consistently. Those are judgement
+> calls; everything geometric is not.
+>
+> ★ House rule: **never report a diagram as finished without a clean run** (`0 errors, 0 warnings`).
+> A figure that only looks right to the eye is how "the box is a bit off" ships.
 
 - [ ] No overlapping elements (text, boxes, lines)
 - [ ] No text right edge intrudes on a neighbor (estimated from character widths)
